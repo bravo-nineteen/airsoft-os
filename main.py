@@ -155,7 +155,7 @@ class GridBackground(QWidget):
         p.setPen(QColor('#496064'))
         p.setFont(QFont('Consolas', 9))
         p.drawText(90, self.height()-40, 'AOS // AIRSOFT OPERATING SYSTEM')
-        p.drawText(90, self.height()-24, 'VERSION 3.5    •    FIELD OPERATIONS')
+        p.drawText(90, self.height()-24, 'VERSION 3.6    •    FIELD OPERATIONS')
         p.end()
 
 class WidgetPanel(QFrame):
@@ -292,7 +292,7 @@ class DockTile(QPushButton):
 class AOJDesktop(GridBackground):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('Airsoft OS 3.5 — UI Overhaul')
+        self.setWindowTitle('Airsoft OS 3.6 — UI Overhaul')
         self.setObjectName('desktop')
         self.resize(1024, 768)
         self.setMinimumSize(800, 600)
@@ -331,7 +331,7 @@ class AOJDesktop(GridBackground):
         self.brand = QLabel()
         self.brand.setPixmap(QPixmap(str(BASE / 'assets' / 'aos_logo.jpg')).scaled(128, 55, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         top.addWidget(self.brand)
-        top.addWidget(label('AIRSOFT OS  /  3.5  •  COMMAND DESKTOP', 12, MUTED))
+        top.addWidget(label('AIRSOFT OS  /  3.6  •  COMMAND DESKTOP', 12, MUTED))
         top.addSpacing(30)
         self.unit_label = label('UNIT  AOJ-001', 11, MUTED)
         top.addWidget(self.unit_label)
@@ -695,7 +695,7 @@ class AOJDesktop(GridBackground):
             # One-time visual migration: back up the old geometry, then use the
             # new six-panel desktop. Never delete user custom layouts.
             if not (isinstance(data, dict) and data.get('_layout_version') == 35):
-                backup = CONFIG.with_name('layout-before-3.5.json')
+                backup = CONFIG.with_name('layout-before-3.6.json')
                 if not backup.exists():
                     shutil.copy2(CONFIG, backup)
                 self.reset_layout()
@@ -1125,7 +1125,7 @@ if __name__ == '__main__':
     pal.setColor(QPalette.PlaceholderText, QColor('#aab9b6'))
     app.setPalette(pal)
     app.setStyleSheet(STYLE)
-    app.setApplicationName('Airsoft OS 3.5')
+    app.setApplicationName('Airsoft OS 3.6')
     desktop = AOJDesktop()
     if '--fullscreen' in sys.argv:
         desktop.showFullScreen()

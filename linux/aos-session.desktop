@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Airsoft OS 3.6
+Comment=Airsoft Operating System native desktop
+Exec=/usr/local/bin/aos-session
+Type=Application
+DesktopNames=AOS

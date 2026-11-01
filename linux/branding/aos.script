@@ -1,0 +1,4 @@
+image = Image("boot-background.png");
+sprite = Sprite(image);
+sprite.SetPosition((Window.GetWidth() - image.GetWidth()) / 2,
+                   (Window.GetHeight() - image.GetHeight()) / 2, -100);

@@ -47,7 +47,7 @@ def settings(path=CONFIG):
     return data
 
 def get_json(url):
-    req=urllib.request.Request(url,headers={'Accept':'application/vnd.github+json','User-Agent':'AOS-Updater/3.3','X-GitHub-Api-Version':'2022-11-28'})
+    req=urllib.request.Request(url,headers={'Accept':'application/vnd.github+json','User-Agent':'AOS-Updater/3.6','X-GitHub-Api-Version':'2022-11-28'})
     with urllib.request.urlopen(req, timeout=15) as r:
         data=r.read(512_001)
         if len(data)>512_000: raise ValueError('GitHub response too large')
@@ -79,7 +79,7 @@ def asset_urls(rel):
     return result
 
 def download(url, path, limit):
-    req=urllib.request.Request(url,headers={'User-Agent':'AOS-Updater/3.3'})
+    req=urllib.request.Request(url,headers={'User-Agent':'AOS-Updater/3.6'})
     total=0
     with urllib.request.urlopen(req, timeout=30) as r, open(path,'wb') as f:
         if urlparse(r.url).scheme!='https': raise ValueError('Insecure redirect')

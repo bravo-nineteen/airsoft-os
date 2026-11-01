@@ -1,0 +1,8 @@
+wallpaper_image = Image("boot-background.png");
+wallpaper_sprite = Sprite(wallpaper_image);
+wallpaper_sprite.SetPosition(0, 0, -100);
+fun refresh_callback () {
+    wallpaper_sprite.SetScale(Window.GetWidth() / wallpaper_image.GetWidth(), Window.GetHeight() / wallpaper_image.GetHeight());
+}
+Plymouth.SetRefreshFunction(refresh_callback);
+refresh_callback();
