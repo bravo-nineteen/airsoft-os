@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 
 import psutil
-from PySide6.QtCore import Qt, QTimer, QRect, Signal, QEvent, QSize, QPointF
+from PySide6.QtCore import Qt, QTimer, QRect, QRectF, Signal, QEvent, QSize, QPointF
 from PySide6.QtGui import QColor, QFont, QIcon, QPainter, QPen, QPixmap, QPainterPath, QPalette
 from aos_planning import PlanningDialog
 from team_ops import TeamOperations
@@ -21,7 +21,7 @@ from cyber_native import CyberOperations
 from PySide6.QtWidgets import (QApplication, QFrame, QWidget, QLabel, QPushButton, QStyleFactory,
     QVBoxLayout, QHBoxLayout, QGridLayout, QProgressBar, QTextEdit, QLineEdit,
     QDialog, QFormLayout, QMessageBox, QFileDialog, QScrollArea, QSizeGrip,
-    QComboBox, QCheckBox, QSpinBox, QColorDialog, QTabWidget, QSlider, QInputDialog, QMenu, QStyle)
+    QComboBox, QCheckBox, QSpinBox, QColorDialog, QTabWidget, QSlider, QInputDialog, QMenu, QStyle, QSizePolicy)
 
 BASE = Path(__file__).resolve().parent
 CONFIG = Path.home() / '.config' / 'aoj-os' / 'layout.json'
@@ -46,71 +46,76 @@ QPushButton#primary {{ background: #5d2627; border-color: #b9413b; }}
 QLabel#muted {{ color: {MUTED}; }}
 QProgressBar {{ border: 1px solid #354649; border-radius: 3px; background: #121c1f; height: 8px; text-align: center; }}
 QProgressBar::chunk {{ background: #62c38a; border-radius: 2px; }}
-QTextEdit, QLineEdit, QPlainTextEdit, QListWidget, QTreeWidget, QTableWidget, QComboBox, QSpinBox { background: #101b1d; color: #edf3f1; selection-background-color: #a33e39; selection-color: white; border: 1px solid #425659; padding: 6px; border-radius: 4px; }
-QDialog, QMessageBox, QFileDialog, QTabWidget, QScrollArea, QMenu { background-color: #10191b; color: #eaf0ee; }
-QTabWidget::pane { border: 1px solid #415457; background: #111c1e; }
-QTabBar::tab { background: #1c2b2e; color: #d9e6e2; padding: 9px 14px; border: 1px solid #3c5152; }
-QTabBar::tab:selected { background: #5c2726; color: white; }
-QCheckBox, QRadioButton { color: #e5efec; spacing: 8px; }
-QScrollBar:vertical { background: #101b1d; width: 14px; }
-QScrollBar::handle:vertical { background: #506769; min-height: 26px; border-radius: 4px; }
-QToolTip { background: #172628; color: #f2f6f4; border: 1px solid #607c7a; }
+QTextEdit, QLineEdit, QPlainTextEdit, QListWidget, QTreeWidget, QTableWidget, QComboBox, QSpinBox {{ background: #101b1d; color: #edf3f1; selection-background-color: #a33e39; selection-color: white; border: 1px solid #425659; padding: 6px; border-radius: 4px; }}
+QDialog, QMessageBox, QFileDialog, QTabWidget, QScrollArea, QMenu {{ background-color: #10191b; color: #eaf0ee; }}
+QTabWidget::pane {{ border: 1px solid #415457; background: #111c1e; }}
+QTabBar::tab {{ background: #1c2b2e; color: #d9e6e2; padding: 9px 14px; border: 1px solid #3c5152; }}
+QTabBar::tab:selected {{ background: #5c2726; color: white; }}
+QCheckBox, QRadioButton {{ color: #e5efec; spacing: 8px; }}
+QScrollBar:vertical {{ background: #101b1d; width: 14px; }}
+QScrollBar::handle:vertical {{ background: #506769; min-height: 26px; border-radius: 4px; }}
+QToolTip {{ background: #172628; color: #f2f6f4; border: 1px solid #607c7a; }}
 
-QPushButton#dockTile { background: #0b1316; border: 1px solid #344649; border-radius: 7px; color: #e8f2f0; font-size: 14px; font-weight: 700; padding: 5px; }
-QPushButton#dockTile:hover { background: #253237; border: 1px solid #dd4b43; }
-QPushButton#dockTile[editing="true"] { background: #5b2425; border: 2px solid #e45d55; }
-QFrame#panel { border: 1px solid #486064; border-left: 2px solid #b83a36; }
-QFrame#top { border-bottom: 2px solid #8f302c; }
-QFrame#dock { border-top: 2px solid #8f302c; }
-QMenu::item { padding: 10px 22px; }
-QMenu::item:selected { background: #612b2a; }
-QLabel { background: transparent; }
-QWidget#desktop { background-color: #0a1113; }
-QWidget#panelBody { background: transparent; }
-QFrame#panel QLabel { background: transparent; }
-QTabWidget QWidget { color: #f1f5f4; }
-QHeaderView::section { background: #203135; color: #f1f5f4; padding: 7px; border: 1px solid #40585a; }
-QTableWidget::item { background: #122125; color: #f1f5f4; }
-QTableWidget::item:selected { background: #7b302d; color: white; }
-QFrame#sidebar { background: #080f12; border-right: 2px solid #96332e; }
-QPushButton#sideIcon { background: #101a1e; border: 1px solid #324448;
-  color: #eef3f2; font-size: 24px; padding: 1px; border-radius: 6px; }
-QPushButton#sideIcon:hover { background: #392021; border: 1px solid #d95148; }
-QPushButton#sideIcon:pressed { background: #6a2926; }
+QPushButton#dockTile {{ background: #0b1316; border: 1px solid #344649; border-radius: 7px; color: #e8f2f0; font-size: 14px; font-weight: 700; padding: 5px; }}
+QPushButton#dockTile:hover {{ background: #253237; border: 1px solid #dd4b43; }}
+QPushButton#dockTile[editing="true"] {{ background: #5b2425; border: 2px solid #e45d55; }}
+QFrame#panel {{ border: 1px solid #486064; border-left: 2px solid #b83a36; }}
+QFrame#panel[editing="true"] {{ border: 2px dashed #db6b56; }}
+QFrame#top {{ border-bottom: 2px solid #8f302c; }}
+QFrame#dock {{ border-top: 2px solid #8f302c; }}
+QMenu::item {{ padding: 10px 22px; }}
+QMenu::item:selected {{ background: #612b2a; }}
+QLabel {{ background: transparent; }}
+QWidget#desktop {{ background-color: #0a1113; }}
+QWidget#panelBody {{ background: transparent; }}
+QFrame#panel QLabel {{ background: transparent; }}
+QTabWidget QWidget {{ color: #f1f5f4; }}
+QHeaderView::section {{ background: #203135; color: #f1f5f4; padding: 7px; border: 1px solid #40585a; }}
+QTableWidget::item {{ background: #122125; color: #f1f5f4; }}
+QTableWidget::item:selected {{ background: #7b302d; color: white; }}
+QFrame#sidebar {{ background: #080f12; border-right: 2px solid #96332e; }}
+QPushButton#sideIcon {{ background: #101a1e; border: 1px solid #324448;
+  color: #eef3f2; font-size: 24px; padding: 1px; border-radius: 6px; }}
+QPushButton#sideIcon:hover {{ background: #392021; border: 1px solid #d95148; }}
+QPushButton#sideIcon:pressed {{ background: #6a2926; }}
 
 """
 
 class CircularGauge(QWidget):
-    """Compact, high-contrast percentage ring."""
+    """Responsive percentage ring; legible at compact widget dimensions."""
     def __init__(self, name):
         super().__init__()
-        self.name=name
-        self.value=None
-        self.setMinimumSize(96,100)
+        self.name = name
+        self.value = None
+        self.setMinimumSize(45, 47)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setToolTip(f'{name}: waiting for live system measurement')
 
     def setValue(self, value):
-        self.value=None if value is None else max(0,min(100,float(value)))
+        self.value = None if value is None else max(0, min(100, float(value)))
+        self.setToolTip(f'{self.name}: ' + ('not available' if self.value is None else f'{self.value:.0f}%'))
         self.update()
 
-    def paintEvent(self,event):
-        p=QPainter(self)
+    def paintEvent(self, event):
+        p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
-        side=min(self.width()-8,self.height()-27,88)
-        r=QRectF((self.width()-side)/2,3,side,side)
-        p.setPen(QPen(QColor('#34474c'),9,Qt.SolidLine,Qt.RoundCap))
-        p.drawArc(r,0,360*16)
+        side = max(24.0, min(float(self.width()-6), float(self.height()-16), 90.0))
+        r = QRectF((self.width()-side)/2.0, 2, side, side)
+        thickness = max(3, min(8, int(side/12)))
+        p.setPen(QPen(QColor('#34474c'), thickness, Qt.SolidLine, Qt.RoundCap))
+        p.drawArc(r, 0, 360*16)
         if self.value is not None:
-            colour=QColor('#ed665c' if self.value>=85 and self.name!='BATTERY' else '#70dba1')
-            if self.name=='BATTERY' and self.value<20: colour=QColor('#ed665c')
-            p.setPen(QPen(colour,9,Qt.SolidLine,Qt.RoundCap))
-            p.drawArc(r,90*16,-int(self.value*3.6*16))
+            alert = (self.value >= 85 and self.name != 'BATTERY') or (self.name == 'BATTERY' and self.value < 20)
+            p.setPen(QPen(QColor('#ed665c' if alert else '#70dba1'), thickness, Qt.SolidLine, Qt.RoundCap))
+            p.drawArc(r, 90*16, -int(self.value*3.6*16))
         p.setPen(QColor('#f0f5f4'))
-        p.setFont(QFont('Sans',14,QFont.Bold))
-        p.drawText(r,Qt.AlignCenter,'N/A' if self.value is None else f'{self.value:.0f}%')
-        p.setFont(QFont('Sans',10,QFont.Bold))
+        p.setFont(QFont('Sans', max(8, min(14, int(side/5))), QFont.Bold))
+        p.drawText(r, Qt.AlignCenter, 'N/A' if self.value is None else f'{self.value:.0f}%')
+        p.setFont(QFont('Sans', max(7, min(10, int(side/8))), QFont.Bold))
         p.setPen(QColor('#a9bdb9'))
-        p.drawText(QRectF(0,r.bottom()+2,self.width(),23),Qt.AlignCenter,self.name)
+        p.drawText(QRectF(0, r.bottom(), self.width(), max(15, self.height()-r.bottom())), Qt.AlignCenter, self.name)
         p.end()
+
 
 def label(text, size=12, color=TEXT, bold=False):
     w = QLabel(text)
@@ -155,84 +160,194 @@ class GridBackground(QWidget):
         p.setPen(QColor('#496064'))
         p.setFont(QFont('Consolas', 9))
         p.drawText(90, self.height()-40, 'AOS // AIRSOFT OPERATING SYSTEM')
-        p.drawText(90, self.height()-24, 'VERSION 3.6    •    FIELD OPERATIONS')
+        p.drawText(90, self.height()-24, 'VERSION 3.9.0    •    FIELD OPERATIONS')
         p.end()
+
+class ResizeCorner(QWidget):
+    """Drag the lower-right corner of a widget while desktop EDIT mode is on."""
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setFixedSize(26, 26)
+        self.setCursor(Qt.SizeFDiagCursor)
+        self.setToolTip('Drag to resize this widget')
+        self.start = None
+
+    def paintEvent(self, event):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        p.setBrush(QColor('#642c29'))
+        p.setPen(QPen(QColor('#ee7568'), 1))
+        p.drawRoundedRect(self.rect().adjusted(2, 2, -2, -2), 4, 4)
+        p.setPen(QPen(QColor('#ffe4db'), 2, Qt.SolidLine, Qt.RoundCap))
+        for offset in (9, 15, 21):
+            p.drawLine(offset, 22, 22, offset)
+        p.end()
+
+    def mousePressEvent(self, event):
+        panel = self.parentWidget()
+        desktop = panel.parentWidget()
+        if event.button() == Qt.LeftButton and desktop.edit_mode and not desktop.widgets_locked:
+            self.start = (event.globalPosition().toPoint(), panel.width(), panel.height())
+            event.accept()
+        else:
+            super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self.start is not None:
+            origin, old_w, old_h = self.start
+            delta = event.globalPosition().toPoint() - origin
+            panel = self.parentWidget()
+            desktop = panel.parentWidget()
+            max_w = max(panel.minimumWidth(), desktop.width() - panel.x() - 8)
+            max_h = max(panel.minimumHeight(), desktop.height() - panel.y() - 8)
+            w = min(max_w, max(panel.minimumWidth(), old_w + delta.x()))
+            h = min(max_h, max(panel.minimumHeight(), old_h + delta.y()))
+            if desktop.snap_enabled:
+                step = max(1, int(desktop.grid_step))
+                w = min(max_w, max(panel.minimumWidth(), round(w/step)*step))
+                h = min(max_h, max(panel.minimumHeight(), round(h/step)*step))
+            panel.resize(w, h)
+            event.accept()
+        else:
+            super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if self.start is not None:
+            self.start = None
+            self.parentWidget().changed.emit()
+            event.accept()
+        else:
+            super().mouseReleaseEvent(event)
+
 
 class WidgetPanel(QFrame):
     changed = Signal()
+
     def __init__(self, title, parent, x, y, w, h, content_builder):
         super().__init__(parent)
         self.title = title
+        self.default_size = (w, h)
         self.setObjectName('panel')
         self.setGeometry(x, y, w, h)
-        self.setMinimumSize(185, 125)
+        self.setMinimumSize(165, 145)
         self._drag = None
-        self._resize = False
         outer = QVBoxLayout(self)
-        outer.setContentsMargins(12, 8, 12, 8)
-        outer.setSpacing(8)
+        outer.setContentsMargins(7, 6, 7, 6)
+        outer.setSpacing(3)
         header = QHBoxLayout()
-        header.addWidget(label('▣  ' + title.upper(), 12, TEXT, True))
+        self.title_label = label('▣  ' + title.upper(), 11, TEXT, True)
+        self.title_label.setToolTip('In EDIT mode, drag this title to move the widget')
+        self.title_label.installEventFilter(self)
+        header.addWidget(self.title_label)
         header.addStretch()
-        close = QPushButton('×')
-        close.setFixedSize(27, 25)
-        close.setToolTip('Hide widget; restore it from Widgets')
-        close.clicked.connect(self.hide_panel)
-        header.addWidget(close)
-        self.close_button = close
-        close.hide()
+        self.close_button = QPushButton('×')
+        self.close_button.setFixedSize(22, 22)
+        self.close_button.setToolTip('Hide widget; restore from Widgets')
+        self.close_button.clicked.connect(self.hide_panel)
+        header.addWidget(self.close_button)
         outer.addLayout(header)
-        body = QWidget()
+        body = QWidget(self)
         body.setObjectName('panelBody')
         outer.addWidget(body, 1)
         content_builder(body)
-        grip = QSizeGrip(self)
-        grip.setFixedSize(16, 16)
-        outer.addWidget(grip, 0, Qt.AlignRight)
-        self.grip = grip
+        self.resize_corner = ResizeCorner(self)
         self.set_edit_mode(False)
         self.show()
 
     def set_edit_mode(self, enabled):
         self.close_button.setVisible(enabled)
-        self.grip.setVisible(enabled)
-        self.grip.setEnabled(enabled)
+        self.resize_corner.setVisible(enabled)
+        self.resize_corner.setEnabled(enabled)
+        self.setProperty('editing', bool(enabled))
+        self.style().unpolish(self)
+        self.style().polish(self)
+        self.resize_corner.raise_()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        if hasattr(self, "grip") and hasattr(self.parentWidget(), "widgets") and self.title in self.parentWidget().widgets:
-            QTimer.singleShot(0, self.changed.emit)
+        if hasattr(self, 'resize_corner'):
+            self.resize_corner.move(self.width()-27, self.height()-27)
+            self.resize_corner.raise_()
+        desktop = self.parentWidget()
+        if hasattr(desktop, 'on_widget_resized'):
+            desktop.on_widget_resized(self)
 
     def hide_panel(self):
         self.hide()
         self.changed.emit()
 
+    def _move_drag(self, global_pos):
+        if self._drag is None:
+            return
+        desktop = self.parentWidget()
+        point = global_pos - self._drag
+        nx = max(80, min(point.x(), desktop.width()-self.width()-8))
+        ny = max(82, min(point.y(), desktop.height()-self.height()-8))
+        if desktop.snap_enabled:
+            step = max(1, int(desktop.grid_step))
+            nx = round(nx/step)*step
+            ny = round(ny/step)*step
+        self.move(nx, ny)
+
+    def eventFilter(self, watched, event):
+        if watched is self.title_label:
+            if event.type() == QEvent.MouseButtonPress and event.button() == Qt.LeftButton:
+                desktop = self.parentWidget()
+                if desktop.edit_mode and not desktop.widgets_locked:
+                    self._drag = event.globalPosition().toPoint() - self.pos()
+                    self.raise_()
+                    return True
+            elif event.type() == QEvent.MouseMove and self._drag is not None:
+                self._move_drag(event.globalPosition().toPoint())
+                return True
+            elif event.type() == QEvent.MouseButtonRelease and self._drag is not None:
+                self._drag = None
+                self.changed.emit()
+                return True
+        return super().eventFilter(watched, event)
+
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton and event.position().y() < 38 and self.parentWidget().edit_mode and not self.parentWidget().widgets_locked:
-            self._drag = event.globalPosition().toPoint() - self.pos()
-            self.raise_()
-            event.accept()
-        else: super().mousePressEvent(event)
+        if event.button() == Qt.LeftButton and event.position().y() < 34:
+            desktop = self.parentWidget()
+            if desktop.edit_mode and not desktop.widgets_locked:
+                self._drag = event.globalPosition().toPoint() - self.pos()
+                self.raise_()
+                event.accept()
+                return
+        super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
         if self._drag is not None:
-            point = event.globalPosition().toPoint() - self._drag
-            parent = self.parentWidget()
-            nx = max(0, min(point.x(), parent.width()-self.width()))
-            ny = max(58, min(point.y(), parent.height()-self.height()-70))
-            if parent.snap_enabled:
-                step = parent.grid_step
-                nx = round(nx / step) * step
-                ny = round(ny / step) * step
-            self.move(nx, ny)
+            self._move_drag(event.globalPosition().toPoint())
             event.accept()
-        else: super().mouseMoveEvent(event)
+        else:
+            super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
         if self._drag is not None:
             self._drag = None
             self.changed.emit()
         super().mouseReleaseEvent(event)
+
+    def contextMenuEvent(self, event):
+        desktop = self.parentWidget()
+        if not desktop.edit_mode or desktop.widgets_locked:
+            return super().contextMenuEvent(event)
+        menu = QMenu(self)
+        for name, dimensions in (('Compact', (185, 195)), ('Standard', self.default_size), ('Large', (420, 340))):
+            action = menu.addAction(f'{name}  ({dimensions[0]}×{dimensions[1]})')
+            action.triggered.connect(lambda checked=False, size=dimensions: self.resize_to_preset(*size))
+        menu.addSeparator()
+        menu.addAction('Hide widget', self.hide_panel)
+        menu.exec(event.globalPos())
+
+    def resize_to_preset(self, width, height):
+        desktop = self.parentWidget()
+        max_w = max(self.minimumWidth(), desktop.width()-self.x()-8)
+        max_h = max(self.minimumHeight(), desktop.height()-self.y()-8)
+        self.resize(min(max_w, max(self.minimumWidth(), width)),
+                    min(max_h, max(self.minimumHeight(), height)))
+        self.changed.emit()
 
 
 class DockTile(QPushButton):
@@ -292,7 +407,7 @@ class DockTile(QPushButton):
 class AOJDesktop(GridBackground):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('Airsoft OS 3.6 — UI Overhaul')
+        self.setWindowTitle('Airsoft OS 3.9.0 — Resizable Widgets')
         self.setObjectName('desktop')
         self.resize(1024, 768)
         self.setMinimumSize(800, 600)
@@ -331,7 +446,7 @@ class AOJDesktop(GridBackground):
         self.brand = QLabel()
         self.brand.setPixmap(QPixmap(str(BASE / 'assets' / 'aos_logo.jpg')).scaled(128, 55, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         top.addWidget(self.brand)
-        top.addWidget(label('AIRSOFT OS  /  3.6  •  COMMAND DESKTOP', 12, MUTED))
+        top.addWidget(label('AIRSOFT OS  /  3.9.0  •  COMMAND DESKTOP', 12, MUTED))
         top.addSpacing(30)
         self.unit_label = label('UNIT  AOJ-001', 11, MUTED)
         top.addWidget(self.unit_label)
@@ -379,7 +494,7 @@ class AOJDesktop(GridBackground):
         self.edit_button = QPushButton('✎')
         self.edit_button.setObjectName('sideIcon')
         self.edit_button.setFixedSize(48, 39)
-        self.edit_button.setToolTip('Edit home screen')
+        self.edit_button.setToolTip('EDIT MODE: drag widget titles to move; drag red corner to resize; right-click for presets')
         self.edit_button.clicked.connect(self.toggle_edit_mode)
         side.addWidget(self.edit_button)
         more = QPushButton('⋯')
@@ -423,6 +538,12 @@ class AOJDesktop(GridBackground):
             self.top.setGeometry(0, 0, self.width(), 72)
             self.sidebar.setGeometry(0, 72, 74, self.height()-72)
 
+    def on_widget_resized(self, panel):
+        # The compact System Status uses only the four circles; other data
+        # remains available in gauge tooltips and the full panel preset.
+        if panel.title == 'System Status' and hasattr(self, 'sys_extra'):
+            self.sys_extra.setVisible(panel.height() >= 245)
+
     def make_panel(self, name, geometry, build):
         panel = WidgetPanel(name, self, *geometry, build)
         panel.changed.connect(self.save_layout)
@@ -431,15 +552,18 @@ class AOJDesktop(GridBackground):
     def create_widgets(self):
         def system(body):
             l=QVBoxLayout(body)
+            l.setContentsMargins(1, 1, 1, 1)
+            l.setSpacing(0)
             grid=QGridLayout()
-            grid.setSpacing(5)
+            grid.setContentsMargins(0, 0, 0, 0)
+            grid.setSpacing(1)
             self.sys_values={}
             for index,name in enumerate(('CPU','RAM','DISK','BATTERY')):
                 gauge=CircularGauge(name)
                 grid.addWidget(gauge,index//2,index%2)
                 self.sys_values[name]=gauge
             l.addLayout(grid)
-            self.sys_extra=label('',10,MUTED)
+            self.sys_extra=label('',9,MUTED)
             self.sys_extra.setWordWrap(True)
             l.addWidget(self.sys_extra)
         def network(body):
@@ -578,7 +702,7 @@ class AOJDesktop(GridBackground):
         self.edit_button.setProperty('editing', self.edit_mode)
         self.edit_button.style().unpolish(self.edit_button)
         self.edit_button.style().polish(self.edit_button)
-        self.log('Home screen edit mode ' + ('enabled' if self.edit_mode else 'disabled'))
+        self.log('EDIT: drag panel titles or red resize corners; right-click for size presets' if self.edit_mode else 'Home screen layout saved')
         if not self.edit_mode: self.save_layout()
 
     def select_team(self):
@@ -661,6 +785,9 @@ class AOJDesktop(GridBackground):
         dialog.setStyleSheet(STYLE + 'QDialog {background-color:#111c1e;color:#f1f5f4;}')
         layout = QVBoxLayout(dialog)
         layout.addWidget(label('DESKTOP WIDGETS', 16, TEXT, True))
+        hint = label('Enable EDIT, drag a widget title to move it and use its red bottom-right corner to resize. Right-click a widget for size presets.', 10, MUTED)
+        hint.setWordWrap(True)
+        layout.addWidget(hint)
         for name, panel in self.widgets.items():
             btn = QPushButton(('✓  ' if panel.isVisible() else '+  ') + name)
             def toggle(checked=False, p=panel):
@@ -683,7 +810,7 @@ class AOJDesktop(GridBackground):
         self.save_layout()
 
     def save_layout(self):
-        data = {'_layout_version': 35, **{name: {'x':p.x(),'y':p.y(),'w':p.width(),'h':p.height(),'visible':p.isVisible()}
+        data = {'_layout_version': 39, **{name: {'x':p.x(),'y':p.y(),'w':p.width(),'h':p.height(),'visible':p.isVisible()}
                 for name,p in self.widgets.items()}}
         try: CONFIG.write_text(json.dumps(data, indent=2), encoding='utf-8')
         except OSError: pass
@@ -694,8 +821,8 @@ class AOJDesktop(GridBackground):
             data = json.loads(CONFIG.read_text(encoding='utf-8'))
             # One-time visual migration: back up the old geometry, then use the
             # new six-panel desktop. Never delete user custom layouts.
-            if not (isinstance(data, dict) and data.get('_layout_version') == 35):
-                backup = CONFIG.with_name('layout-before-3.6.json')
+            if not (isinstance(data, dict) and data.get('_layout_version') in (35, 39)):
+                backup = CONFIG.with_name('layout-before-3.9.json')
                 if not backup.exists():
                     shutil.copy2(CONFIG, backup)
                 self.reset_layout()
@@ -703,8 +830,12 @@ class AOJDesktop(GridBackground):
             for name, p in self.widgets.items():
                 d = data.get(name)
                 if not d: continue
-                p.setGeometry(d['x'],d['y'],d['w'],d['h'])
-                p.setVisible(d.get('visible',True))
+                x = max(80, min(int(d['x']), self.width()-p.minimumWidth()-8))
+                y = max(82, min(int(d['y']), self.height()-p.minimumHeight()-8))
+                w = min(max(p.minimumWidth(), int(d['w'])), self.width()-x-8)
+                h = min(max(p.minimumHeight(), int(d['h'])), self.height()-y-8)
+                p.setGeometry(x, y, max(p.minimumWidth(), w), max(p.minimumHeight(), h))
+                p.setVisible(bool(d.get('visible', True)))
         except (ValueError, KeyError, TypeError, OSError): pass
 
     def info_dialog(self, title, text, buttons=None):
@@ -812,7 +943,7 @@ class AOJDesktop(GridBackground):
 
     def settings_window(self):
         dialog = QDialog(self)
-        dialog.setWindowTitle('AOS CONTROL CENTRE // 3.4')
+        dialog.setWindowTitle('AOS CONTROL CENTRE // 3.9.0')
         dialog.resize(660, 610)
         dialog.setStyleSheet(STYLE + 'QDialog {background-color:#111c1e;color:#f1f5f4;}')
         outer = QVBoxLayout(dialog)
@@ -1125,7 +1256,7 @@ if __name__ == '__main__':
     pal.setColor(QPalette.PlaceholderText, QColor('#aab9b6'))
     app.setPalette(pal)
     app.setStyleSheet(STYLE)
-    app.setApplicationName('Airsoft OS 3.6')
+    app.setApplicationName('Airsoft OS 3.9.0')
     desktop = AOJDesktop()
     if '--fullscreen' in sys.argv:
         desktop.showFullScreen()
@@ -1136,4 +1267,7 @@ if __name__ == '__main__':
         desktop.show()
     else:
         desktop.show()
+    # Ensure chrome is not hidden by background or panels restored from old layouts.
+    desktop.top.raise_()
+    desktop.sidebar.raise_()
     sys.exit(app.exec())

@@ -1,24 +1,38 @@
 #!/bin/sh
-# AOS desktop session. Keep Openbox as a recoverable window manager.
+# Xorg/LightDM AOS session. Errors remain readable in ~/.local/state/aos.
 export GTK_THEME=Adwaita:dark
 export QT_STYLE_OVERRIDE=Fusion
 export XDG_CURRENT_DESKTOP=AOS
-python3 /opt/aos/linux/configure-openbox.py
-python3 /opt/aos/linux/configure-window-theme.py
-openbox --config-file "$HOME/.config/aoj-os/openbox-rc.xml" &
+LOGDIR="${XDG_STATE_HOME:-$HOME/.local/state}/aos"
+mkdir -p "$LOGDIR"
+SESSIONLOG="$LOGDIR/session.log"
+python3 /opt/aos/linux/configure-openbox.py >> "$SESSIONLOG" 2>&1 || true
+python3 /opt/aos/linux/configure-window-theme.py >> "$SESSIONLOG" 2>&1 || true
+# Launch openbox even if a legacy config is broken.
+if [ -s "$HOME/.config/aoj-os/openbox-rc.xml" ]; then
+  openbox --config-file "$HOME/.config/aoj-os/openbox-rc.xml" >> "$SESSIONLOG" 2>&1 &
+else
+  openbox >> "$SESSIONLOG" 2>&1 &
+fi
 WM_PID=$!
 if command -v xfce4-power-manager >/dev/null 2>&1; then xfce4-power-manager >/dev/null 2>&1 & fi
 if command -v nm-applet >/dev/null 2>&1; then nm-applet >/dev/null 2>&1 & fi
-if command -v thunar >/dev/null 2>&1; then
-    thunar --daemon >/dev/null 2>&1 &
-    if command -v thunar-volman >/dev/null 2>&1; then thunar-volman --daemon >/dev/null 2>&1 & fi
-fi
-# Restart the AOS shell on crashes; a normal exit returns to the login screen.
-while kill -0 "$WM_PID" 2>/dev/null; do
-    /opt/aos/linux/start-aos.sh
-    CODE=$?
-    [ "$CODE" -eq 0 ] && break
-    sleep 2
+if command -v thunar >/dev/null 2>&1; then thunar --daemon >/dev/null 2>&1 & fi
+# Desktop crashes are not silently retried forever.
+TRIES=0
+while [ "$TRIES" -lt 2 ]; do
+  /opt/aos/linux/start-aos.sh
+  RESULT=$?
+  [ "$RESULT" -eq 0 ] && break
+  TRIES=$((TRIES+1))
+  printf 'AOS stopped: %s at %s\n' "$RESULT" "$(date -Is)" >> "$SESSIONLOG"
+  sleep 1
 done
+if [ "$TRIES" -ge 2 ]; then
+  # Keep the session visible so the operator can inspect or copy the logs.
+  if command -v xterm >/dev/null 2>&1; then
+    xterm -fa 'DejaVu Sans Mono' -fs 12 -title 'AOS startup failed - diagnostics' -e sh -c       'echo "AOS DID NOT START. Latest log:"; tail -100 "$HOME/.local/state/aos/desktop.log"; echo; echo "Press Enter to exit the session"; read x'
+  fi
+fi
 kill "$WM_PID" 2>/dev/null || true
 wait "$WM_PID" 2>/dev/null || true

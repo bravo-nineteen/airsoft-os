@@ -30,7 +30,7 @@ FILES={
  'aos_network.py','aos_network_gui.py','aos_field_sync.py',
  'aos_live.py','aos_live_gui.py','aos_devices.py','aos_release.py',
  'aos_widgets.py','aos_planning.py','team_ops.py','cyber_native.py',
- 'requirements.txt','VERSION',
+ 'requirements.txt','VERSION','aos_doctor.py',
 }
 MAX_FILES=180
 MAX_BYTES=30*1024*1024
@@ -74,6 +74,15 @@ def install(folder, app=APP, state=STATE, trusted=TRUST):
     with zipfile.ZipFile(folder/BUNDLE) as z:
         content_version=z.read('VERSION').decode().strip()
     if content_version!=info['version']: raise ValueError('Version mismatch')
+    # Never downgrade to an older release through the normal update command.
+    def parts(v):
+        import re
+        if not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+',v):
+            raise ValueError('Version must be numeric MAJOR.MINOR.PATCH')
+        return tuple(int(n) for n in v.split('.'))
+    current_version=(app/'VERSION').read_text().strip() if (app/'VERSION').is_file() else '0.0.0'
+    if parts(content_version) <= parts(current_version):
+        raise ValueError('Release is not newer than installed AOS ('+current_version+')')
     state.mkdir(mode=0o700,parents=True,exist_ok=True)
     with open(state/'update.lock','a+b') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX)
