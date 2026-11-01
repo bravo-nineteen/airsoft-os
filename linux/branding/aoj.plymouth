@@ -1,8 +1,0 @@
-[Plymouth Theme]
-Name=AOJ OS
-Description=AOJ OS tactical startup screen
-ModuleName=script
-
-[script]
-ImageDir=/usr/share/plymouth/themes/aoj
-ScriptFile=/usr/share/plymouth/themes/aoj/aoj.script

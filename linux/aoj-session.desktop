@@ -1,6 +1,0 @@
-[Desktop Entry]
-Name=AOJ OS Alpha 0.7
-Comment=AOJ tactical desktop environment
-Exec=/usr/local/bin/aoj-session
-Type=Application
-DesktopNames=AOJ
