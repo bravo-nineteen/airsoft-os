@@ -1,0 +1,24 @@
+#!/bin/sh
+export GTK_THEME=Adwaita:dark
+export QT_QPA_PLATFORMTHEME=
+export XDG_DATA_DIRS="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+export QT_STYLE_OVERRIDE=Fusion
+export XDG_CURRENT_DESKTOP=AOS
+python3 /opt/aoj-os/linux/configure-openbox.py
+python3 /opt/aoj-os/linux/configure-window-theme.py
+openbox --config-file "$HOME/.config/aoj-os/openbox-rc.xml" &
+WM_PID=$!
+# Removable media watcher, only if available.
+if command -v thunar >/dev/null 2>&1; then
+  thunar --daemon >/dev/null 2>&1 &
+  if command -v thunar-volman >/dev/null 2>&1; then thunar-volman --daemon >/dev/null 2>&1 & fi
+fi
+# Start the conventional Linux taskbar independently of AOS.
+if command -v tint2 >/dev/null 2>&1; then
+  tint2 -c /etc/xdg/aos/tint2.conf >/dev/null 2>&1 &
+  sleep 1
+fi
+# AOS is a desktop application, not the display manager.
+# If it crashes or closes, Openbox and tint2 remain usable.
+ /opt/aoj-os/linux/start-aoj.sh
+wait "$WM_PID"

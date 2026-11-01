@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=AOS
+Description=Airsoft Operating System boot splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/aos
+ScriptFile=/usr/share/plymouth/themes/aos/aos.script
